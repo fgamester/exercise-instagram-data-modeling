@@ -16,7 +16,8 @@ class User(Base):
     email = Column(String(120), nullable=False, unique=True)
 
     posts = relationship('Post', backref='user')
-    followers = relationship('User', secondary='followers')
+    followers = relationship('User', foreign_keys='Follower.user_to_id', back_populates='followed_user')
+    following = relationship('User', foreign_keys='Follower.user_from_id', back_populates='follower_user')
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -49,6 +50,9 @@ class Follower(Base):
     __tablename__ = 'followers'
     user_from_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     user_to_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+
+    follower_user = relationship('User', foreign_keys='user_from_id', back_populates='following')
+    followed_user = relationship('User', foreign_keys='user_to_id', back_populates='followers')
 
 ## Draw from SQLAlchemy base
 try:
